@@ -52,7 +52,7 @@ const SeatSelectionPage: React.FC = () => {
       return;
     }
 
-    fetch(`/api/buses/${busId}?date=${selectedDate}`)
+    fetch(`${import.meta.env.VITE_API_URL || ''}/api/buses/${busId}?date=${selectedDate}`)
       .then((res) => {
         if (!res.ok) throw new Error("Bus not found");
         return res.json();

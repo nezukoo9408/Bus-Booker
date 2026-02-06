@@ -7,6 +7,9 @@ import App from './App.tsx';
 import './index.css';
 import { AuthProvider } from './contexts/AuthContext';
 import ErrorBoundary from './components/common/ErrorBoundary';
+import { API_BASE_URL } from './config';
+
+axios.defaults.baseURL = API_BASE_URL;
 
 // Attach auth token to API requests
 axios.interceptors.request.use((config) => {
