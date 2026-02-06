@@ -3,10 +3,17 @@ import { body, validationResult } from 'express-validator';
 import jwt from 'jsonwebtoken';
 import dotenv from 'dotenv';
 import User from '../models/User.js';
+import { protect } from '../middleware/auth.js';
 
 dotenv.config();
 
+const JWT_SECRET = process.env.JWT_SECRET || 'your_jwt_secret_key';
 const router = express.Router();
+
+// Get current user (protected)
+router.get('/me', protect, (req, res) => {
+  res.json({ user: req.user });
+});
 
 // Register a new user
 router.post(
@@ -35,7 +42,7 @@ router.post(
 
       const token = jwt.sign(
         { id: user.id, role: user.role },
-        process.env.JWT_SECRET,
+        JWT_SECRET,
         { expiresIn: '30d' }
       );
 
@@ -83,7 +90,7 @@ router.post(
 
       const token = jwt.sign(
         { id: user.id, role: user.role },
-        process.env.JWT_SECRET,
+        JWT_SECRET,
         { expiresIn: '30d' }
       );
 

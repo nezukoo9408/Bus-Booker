@@ -33,7 +33,7 @@ const MyBookingsPage: React.FC = () => {
 
   const fetchBookings = () => {
     axios
-      .get('http://localhost:5000/api/bookings')
+      .get('/api/bookings')
       .then((res) => setBookings(res.data))
       .catch((err) => console.error('Error fetching bookings:', err))
       .finally(() => setIsLoading(false));
@@ -48,7 +48,7 @@ const MyBookingsPage: React.FC = () => {
 
     try {
       // Send the delete request
-      await axios.delete(`http://localhost:5000/api/bookings/${confirmId}`);
+      await axios.delete(`/api/bookings/${confirmId}`);
 
       // Update the status of the cancelled booking directly in the state
       setBookings((prevBookings) =>

@@ -39,7 +39,7 @@ const BusListPage: React.FC = () => {
       setLoading(true);
       try {
         const response = await fetch(
-          `http://localhost:5000/api/buses/search?source=${fromParam}&destination=${toParam}&journeyDate=${dateParam}`
+          `/api/buses/search?source=${fromParam}&destination=${toParam}&journeyDate=${dateParam}`
         );
         const data = await response.json();
         setBuses(data);

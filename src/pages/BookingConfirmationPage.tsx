@@ -56,7 +56,7 @@ const BookingConfirmationPage: React.FC = () => {
   setBookingInfo(info);
 
   // Send to backend
-axios.post('http://localhost:5000/api/bookings', {
+axios.post('/api/bookings', {
   busId: info.busId,
   seats: info.selectedSeats,
   totalFare: info.totalPrice,

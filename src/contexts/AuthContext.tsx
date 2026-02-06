@@ -1,14 +1,14 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
-import { supabase } from './supabaseClient';
 import { useNavigate } from 'react-router-dom';
 import toast from 'react-hot-toast';
+import axios from 'axios';
 
 // Define types
 export interface User {
   id: string;
   email: string;
   phone?: string;
-  name?: string;         // optional since Supabase doesn't return it directly
+  name?: string;
   role?: 'user' | 'admin';
 }
 
@@ -36,23 +36,23 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
       if (token) {
         try {
-          const { data, error } = await supabase.auth.getUser();
-
-          if (error || !data.user) {
+          const response = await axios.get('/api/auth/me', {
+            headers: { Authorization: `Bearer ${token}` },
+          });
+          if (response.data?.user) {
+            const u = response.data.user;
+            setUser({
+              id: u._id || u.id,
+              email: u.email ?? '',
+              phone: u.phone ?? '',
+              name: u.name ?? '',
+              role: u.role ?? 'user',
+            });
+            setIsAuthenticated(true);
+          } else {
             localStorage.removeItem('token');
             setUser(null);
             setIsAuthenticated(false);
-          } else {
-            const supaUser = data.user;
-            const appUser: User = {
-              id: supaUser.id,
-              email: supaUser.email ?? '',
-              phone: supaUser.phone ?? '',
-              name: supaUser.user_metadata?.name ?? '',  // try to extract name
-              role: 'user', // default role
-            };
-            setUser(appUser);
-            setIsAuthenticated(true);
           }
         } catch {
           localStorage.removeItem('token');
@@ -60,7 +60,6 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
           setIsAuthenticated(false);
         }
       }
-
       setIsLoading(false);
     };
 
@@ -69,83 +68,57 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   const login = async (email: string, password: string): Promise<boolean> => {
     try {
-      const { data, error } = await supabase.auth.signInWithPassword({
-        email,
-        password,
-      });
-
-      if (error || !data.user) {
-        toast.error(error?.message || 'Login failed');
-        return false;
+      const { data } = await axios.post('/api/auth/login', { email, password });
+      if (data.token && data.user) {
+        localStorage.setItem('token', data.token);
+        setUser({
+          id: data.user._id || data.user.id,
+          email: data.user.email ?? '',
+          phone: data.user.phone ?? '',
+          name: data.user.name ?? '',
+          role: data.user.role ?? 'user',
+        });
+        setIsAuthenticated(true);
+        toast.success('Successfully logged in!');
+        return true;
       }
-
-      localStorage.setItem('token', data.session?.access_token || '');
-
-      const appUser: User = {
-        id: data.user.id,
-        email: data.user.email ?? '',
-        phone: data.user.phone ?? '',
-        name: data.user.user_metadata?.name ?? '',
-        role: 'user',
-      };
-
-      setUser(appUser);
-      setIsAuthenticated(true);
-      toast.success('Successfully logged in!');
-      return true;
-    } catch (err) {
-      if (err instanceof Error) {
-        toast.error(err.message);
-      } else {
-        toast.error('Login failed');
-      }
+      return false;
+    } catch (err: unknown) {
+      const msg = axios.isAxiosError(err) && err.response?.data?.message
+        ? err.response.data.message
+        : 'Login failed';
+      toast.error(msg);
       return false;
     }
   };
 
   const register = async (name: string, email: string, password: string): Promise<boolean> => {
     try {
-      const { data, error } = await supabase.auth.signUp({
-        email,
-        password,
-        options: {
-          data: {
-            name,
-          },
-        },
-      });
-
-      if (error || !data.user) {
-        toast.error(error?.message || 'Registration failed');
-        return false;
+      const { data } = await axios.post('/api/auth/register', { name, email, password });
+      if (data.token && data.user) {
+        localStorage.setItem('token', data.token);
+        setUser({
+          id: data.user._id || data.user.id,
+          email: data.user.email ?? '',
+          phone: data.user.phone ?? '',
+          name: data.user.name ?? name,
+          role: data.user.role ?? 'user',
+        });
+        setIsAuthenticated(true);
+        toast.success('Registration successful!');
+        return true;
       }
-
-      localStorage.setItem('token', data.session?.access_token || '');
-
-      const appUser: User = {
-        id: data.user.id,
-        email: data.user.email ?? '',
-        phone: data.user.phone ?? '',
-        name,
-        role: 'user',
-      };
-
-      setUser(appUser);
-      setIsAuthenticated(true);
-      toast.success('Registration successful!');
-      return true;
-    } catch (err) {
-      if (err instanceof Error) {
-        toast.error(err.message);
-      } else {
-        toast.error('Registration failed');
-      }
+      return false;
+    } catch (err: unknown) {
+      const msg = axios.isAxiosError(err) && err.response?.data?.message
+        ? err.response.data.message
+        : 'Registration failed';
+      toast.error(msg);
       return false;
     }
   };
 
   const logout = () => {
-    supabase.auth.signOut();
     localStorage.removeItem('token');
     setUser(null);
     setIsAuthenticated(false);
@@ -160,7 +133,6 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   );
 };
 
-// Custom hook
 export const useAuth = (): AuthContextType => {
   const context = useContext(AuthContext);
   if (!context) throw new Error('useAuth must be used within an AuthProvider');

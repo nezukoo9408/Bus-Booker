@@ -2,15 +2,25 @@ import { StrictMode } from 'react';
 import { createRoot } from 'react-dom/client';
 import { BrowserRouter as Router } from 'react-router-dom';
 import { Toaster } from 'react-hot-toast';
+import axios from 'axios';
 import App from './App.tsx';
 import './index.css';
 import { AuthProvider } from './contexts/AuthContext';
+import ErrorBoundary from './components/common/ErrorBoundary';
+
+// Attach auth token to API requests
+axios.interceptors.request.use((config) => {
+  const token = localStorage.getItem('token');
+  if (token) config.headers.Authorization = `Bearer ${token}`;
+  return config;
+});
 
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
-    <Router>
-      <AuthProvider>
-        <App />
+    <ErrorBoundary>
+      <Router>
+        <AuthProvider>
+          <App />
         <Toaster 
           position="bottom-right"
           toastOptions={{
@@ -36,7 +46,8 @@ createRoot(document.getElementById('root')!).render(
             },
           }}
         />
-      </AuthProvider>
-    </Router>
+        </AuthProvider>
+      </Router>
+    </ErrorBoundary>
   </StrictMode>
 );

@@ -52,7 +52,7 @@ const SeatSelectionPage: React.FC = () => {
       return;
     }
 
-    fetch(`http://localhost:5000/api/buses/${busId}?date=${selectedDate}`)
+    fetch(`/api/buses/${busId}?date=${selectedDate}`)
       .then((res) => {
         if (!res.ok) throw new Error("Bus not found");
         return res.json();
