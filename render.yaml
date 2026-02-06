@@ -1,6 +1,3 @@
-# Render Blueprint - https://render.com/docs/blueprint-spec
-# Deploy both services: connect repo and Render will create them from this file
-
 services:
   # Backend API
   - type: web
@@ -21,11 +18,10 @@ services:
       - key: FRONTEND_URL
         sync: false
 
-  # Frontend (Static Site) - Deploy AFTER backend, set VITE_API_URL in dashboard
+  # Frontend (Static Site)
   - type: web
     name: busbooker-web
     runtime: static
-    region: oregon
     plan: free
     buildCommand: npm install && npm run build
     staticPublishPath: dist
