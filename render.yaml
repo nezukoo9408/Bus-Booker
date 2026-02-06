@@ -19,7 +19,7 @@ services:
         sync: false
 
   # Frontend (Static Site)
-  - type: static
+  - type: static_site
     name: busbooker-web
     buildCommand: npm install && npm run build
     staticPublishPath: dist
