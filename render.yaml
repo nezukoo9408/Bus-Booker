@@ -15,9 +15,9 @@ services:
       - key: JWT_SECRET
         generateValue: true
       - key: FRONTEND_URL
-        value: https://busbooker-web.onrender.com
+        value: https://bus-booker.onrender.com
   - type: web
-    name: busbooker-web
+    name: bus-booker
     runtime: static
     region: oregon
     plan: free

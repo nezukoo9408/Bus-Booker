@@ -9,7 +9,7 @@ import { AuthProvider } from './contexts/AuthContext';
 import ErrorBoundary from './components/common/ErrorBoundary';
 
 // Set backend URL
-axios.defaults.baseURL = 'https://busbooker-api.onrender.com';
+axios.defaults.baseURL = 'http://localhost:5002';
 
 // Attach auth token to API requests
 axios.interceptors.request.use((config) => {

@@ -30,7 +30,9 @@ app.use(helmet());
 app.use(morgan('dev'));
 
 // Database connection
-mongoose.connect(process.env.MONGODB_URI || 'mongodb+srv://Admin:1234ramsha%40@cluster0.8rqh5cq.mongodb.net/bus?retryWrites=true&w=majority&appName=Cluster0')
+const mongoURI = process.env.MONGODB_URI || 'mongodb+srv://Admin:1234ramsha%40@cluster0.8rqh5cq.mongodb.net/?appName=Cluster0';
+
+mongoose.connect(mongoURI)
   .then(() => console.log('MongoDB connected'))
   .catch(err => console.error('MongoDB connection error:', err));
 
