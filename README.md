@@ -134,6 +134,7 @@ Backend will run on `http://localhost:5001`
 
 **Terminal 2 - Start Frontend:**
 ```bash
+cd src
 npm run dev
 ```
 Frontend will run on `http://localhost:5173`

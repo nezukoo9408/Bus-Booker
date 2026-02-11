@@ -6,12 +6,12 @@ export default defineConfig({
   plugins: [react()],
   base: './',
   define: {
-    'import.meta.env.VITE_API_URL': JSON.stringify('http://localhost:5002')
+    'import.meta.env.VITE_API_URL': JSON.stringify('http://localhost:5001')
   },
   server: {
     proxy: {
       '/api': {
-        target: 'http://localhost:5002',
+        target: 'http://localhost:5001',
         changeOrigin: true,
       },
     },

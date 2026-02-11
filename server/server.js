@@ -32,9 +32,22 @@ app.use(morgan('dev'));
 // Database connection
 const mongoURI = process.env.MONGODB_URI || 'mongodb+srv://Admin:1234ramsha%40@cluster0.8rqh5cq.mongodb.net/?appName=Cluster0';
 
+console.log('🔗 Attempting to connect to MongoDB...');
+console.log('🔗 MongoDB URI:', mongoURI.replace(/\/\/.*@/, '//***:***@')); // Hide credentials
+
 mongoose.connect(mongoURI)
-  .then(() => console.log('MongoDB connected'))
-  .catch(err => console.error('MongoDB connection error:', err));
+  .then(() => {
+    console.log('✅ MongoDB connected successfully');
+    console.log('📊 Database name:', mongoose.connection.name);
+    console.log('📊 Connection host:', mongoose.connection.host);
+  })
+  .catch(err => {
+    console.error('❌ MongoDB connection error details:', {
+      message: err.message,
+      name: err.name,
+      code: err.code
+    });
+  });
 
 // Routes
 app.use('/api/auth', authRoutes);

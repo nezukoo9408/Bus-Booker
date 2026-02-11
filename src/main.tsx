@@ -9,7 +9,7 @@ import { AuthProvider } from './contexts/AuthContext';
 import ErrorBoundary from './components/common/ErrorBoundary';
 
 // Set backend URL
-axios.defaults.baseURL = 'http://localhost:5002';
+axios.defaults.baseURL = 'http://localhost:5001';
 
 // Attach auth token to API requests
 axios.interceptors.request.use((config) => {
