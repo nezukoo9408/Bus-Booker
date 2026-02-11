@@ -23,9 +23,13 @@ const PORT = process.env.PORT || 5001;
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(cors({
-  origin: process.env.FRONTEND_URL || true,
+  origin: process.env.FRONTEND_URL?.trim(),
   credentials: true,
 }));
+if (!process.env.FRONTEND_URL) {
+  console.warn("⚠️ FRONTEND_URL not set");
+}
+
 app.use(helmet());
 app.use(morgan('dev'));
 
