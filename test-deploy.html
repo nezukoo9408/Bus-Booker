@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test Deployment</title>
+    <script>
+        console.log('HTML loaded');
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('DOM loaded');
+            const root = document.getElementById('root');
+            if (root) {
+                root.innerHTML = '<h1 style="color: red; text-align: center; margin-top: 50px;">TEST PAGE - If you see this, HTML is working</h1>';
+            }
+        });
+    </script>
+</head>
+<body>
+    <div id="root">
+        <h1 style="color: blue; text-align: center; margin-top: 50px;">Loading...</h1>
+    </div>
+</body>
+</html>

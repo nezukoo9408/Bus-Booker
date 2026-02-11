@@ -7,9 +7,9 @@ import App from './App.tsx';
 import './index.css';
 import { AuthProvider } from './contexts/AuthContext';
 import ErrorBoundary from './components/common/ErrorBoundary';
-import { API_BASE_URL } from './config';
 
-axios.defaults.baseURL = API_BASE_URL;
+// Set backend URL
+axios.defaults.baseURL = 'https://busbooker-api.onrender.com';
 
 // Attach auth token to API requests
 axios.interceptors.request.use((config) => {
@@ -24,31 +24,31 @@ createRoot(document.getElementById('root')!).render(
       <Router>
         <AuthProvider>
           <App />
-        <Toaster 
-          position="bottom-right"
-          toastOptions={{
-            duration: 4000,
-            style: {
-              background: '#fff',
-              color: '#1e293b',
-              borderRadius: '0.5rem',
-              padding: '1rem',
-              boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06)',
-            },
-            success: {
-              iconTheme: {
-                primary: '#2e7d32',
-                secondary: '#fff',
+          <Toaster 
+            position="bottom-right"
+            toastOptions={{
+              duration: 4000,
+              style: {
+                background: '#fff',
+                color: '#1e293b',
+                borderRadius: '0.5rem',
+                padding: '1rem',
+                boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06)',
               },
-            },
-            error: {
-              iconTheme: {
-                primary: '#d32f2f',
-                secondary: '#fff',
+              success: {
+                iconTheme: {
+                  primary: '#2e7d32',
+                  secondary: '#fff',
+                },
               },
-            },
-          }}
-        />
+              error: {
+                iconTheme: {
+                  primary: '#d32f2f',
+                  secondary: '#fff',
+                },
+              },
+            }}
+          />
         </AuthProvider>
       </Router>
     </ErrorBoundary>
