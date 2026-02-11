@@ -14,3 +14,15 @@ services:
         sync: false
       - key: JWT_SECRET
         generateValue: true
+      - key: FRONTEND_URL
+        value: https://busbooker-web.onrender.com
+  - type: web
+    name: busbooker-web
+    runtime: static
+    region: oregon
+    plan: free
+    buildCommand: npm install && npm run build
+    publishPath: dist
+    envVars:
+      - key: VITE_API_URL
+        value: https://busbooker-api.onrender.com
