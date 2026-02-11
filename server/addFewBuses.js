@@ -55,7 +55,7 @@ async function addFewBuses() {
 
     console.log('🚌 Adding minimal buses...');
 
-    // Add only 3 buses per route per day
+    // Add 7 buses per route per day
     for (let i = 0; i < cities.length; i++) {
       for (let j = 0; j < cities.length; j++) {
         if (i !== j) {
@@ -65,7 +65,7 @@ async function addFewBuses() {
           console.log(`📍 Processing route: ${source} to ${destination}`);
           
           for (const date of journeyDates) {
-            for (let busIndex = 0; busIndex < 3; busIndex++) {
+            for (let busIndex = 0; busIndex < 7; busIndex++) {
               const busNumber = `${source.substring(0, 3).toUpperCase()}-${destination.substring(0, 3).toUpperCase()}-${date.replace(/-/g, '')}-${String(busIndex + 1).padStart(2, '0')}`;
               
               const bus = new Bus({
@@ -97,7 +97,7 @@ async function addFewBuses() {
     console.log(`🎉 Successfully added ${totalBusesAdded} buses to the database!`);
     console.log(`📍 Cities covered: ${cities.join(', ')}`);
     console.log(`📅 Days covered: ${journeyDates.length} days`);
-    console.log(`🚌 Buses per route per day: 3`);
+    console.log(`🚌 Buses per route per day: 7`);
     console.log(`💰 Price: ₹200 per seat`);
     
     const busCount = await Bus.countDocuments();
