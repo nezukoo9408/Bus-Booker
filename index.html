@@ -1,18 +1,23 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <link rel="icon" type="image/svg+xml" href="./bus-icon.svg" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>BusBooker - Bus Reservation System</title>
-    <meta name="description" content="Book bus tickets easily with real-time seat selection and instant confirmation" />
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-    <script type="module" crossorigin src="./assets/index-CgZ9xDO1.js"></script>
-    <link rel="stylesheet" crossorigin href="./assets/index-ezz0nMuO.css">
-  </head>
-  <body>
-    <div id="root"></div>
-  </body>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test Deployment</title>
+    <script>
+        console.log('HTML loaded');
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('DOM loaded');
+            const root = document.getElementById('root');
+            if (root) {
+                root.innerHTML = '<h1 style="color: red; text-align: center; margin-top: 50px;">TEST PAGE - If you see this, HTML is working</h1>';
+            }
+        });
+    </script>
+</head>
+<body>
+    <div id="root">
+        <h1 style="color: blue; text-align: center; margin-top: 50px;">Loading...</h1>
+    </div>
+</body>
 </html>
