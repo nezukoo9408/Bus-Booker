@@ -63,13 +63,19 @@ const SeatSelectionPage: React.FC = () => {
           busName: data.busName,
           hasTwoDecks: data.hasTwoDecks,
           seatsLower: data.seatsLower?.length || 0,
-          seatsUpper: data.seatsUpper?.length || 0
+          seatsUpper: data.seatsUpper?.length || 0,
+          seatsUpperData: data.seatsUpper?.slice(0, 3) // Show first 3 upper seats
         });
         
         // Force hasTwoDecks to true if seatsUpper exists
         if (data.seatsUpper && data.seatsUpper.length > 0 && !data.hasTwoDecks) {
+          console.log("🔧 Forcing hasTwoDecks to true because seatsUpper exists");
           data.hasTwoDecks = true;
         }
+        
+        // Log deck selection condition
+        const shouldShowDeckSelection = data.seatsUpper && data.seatsUpper.length > 0;
+        console.log("🎯 Deck selection will show:", shouldShowDeckSelection);
         
         setBus(data);
         setLoading(false);
@@ -271,18 +277,28 @@ return (
         </div>
 
         {/* Show deck selection if upper seats exist */}
-        {(bus.seatsUpper && bus.seatsUpper.length > 0) && (
+        {(() => {
+          const showDeckSelection = bus.seatsUpper && bus.seatsUpper.length > 0;
+          console.log("🎯 Rendering deck selection:", showDeckSelection, "Upper seats:", bus.seatsUpper?.length || 0);
+          return showDeckSelection;
+        })() && (
           <div className="bg-white rounded-lg shadow-sm p-4 mb-6">
             <div className="flex space-x-4">
               <button
                 className={`px-4 py-2 rounded-md flex items-center ${activeDeck === 'lower' ? 'bg-primary-100 text-primary-700 font-medium' : 'bg-slate-100 text-slate-700 hover:bg-slate-200'}`}
-                onClick={() => setActiveDeck('lower')}
+                onClick={() => {
+                  console.log("🔄 Switching to lower deck");
+                  setActiveDeck('lower');
+                }}
               >
                 <Bus size={18} className="mr-2" /> Lower Deck ({bus.seatsLower?.length || 0} seats)
               </button>
               <button
                 className={`px-4 py-2 rounded-md flex items-center ${activeDeck === 'upper' ? 'bg-primary-100 text-primary-700 font-medium' : 'bg-slate-100 text-slate-700 hover:bg-slate-200'}`}
-                onClick={() => setActiveDeck('upper')}
+                onClick={() => {
+                  console.log("🔄 Switching to upper deck");
+                  setActiveDeck('upper');
+                }}
               >
                 <Bus size={18} className="mr-2" /> Upper Deck ({bus.seatsUpper?.length || 0} seats)
               </button>
@@ -334,7 +350,15 @@ return (
               </div>
               
               <div className="flex flex-wrap justify-center mb-10">
-                {activeDeck === 'lower' ? renderSeatLayout(bus.seatsLower || []) : renderSeatLayout(bus.seatsUpper || [])}
+                {(() => {
+                  const currentDeckSeats = activeDeck === 'lower' ? bus.seatsLower || [] : bus.seatsUpper || [];
+                  console.log("🪑 Displaying seats:", {
+                    activeDeck,
+                    seatCount: currentDeckSeats.length,
+                    sampleSeats: currentDeckSeats.slice(0, 3).map(s => s.number)
+                  });
+                  return renderSeatLayout(currentDeckSeats);
+                })()}
               </div>
               <div className="w-32 mx-auto mt-8">
                 <div className="border-2 border-dashed border-slate-300 rounded-lg p-2 text-center text-sm text-slate-500">
