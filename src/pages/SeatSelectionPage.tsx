@@ -130,29 +130,32 @@ const toggleSeat = (seat: Seat) => {
   }
 
 const renderSeatLayout = (seats: Seat[]) => {
-  const singleSeats = seats.filter(seat => /^[LU]?[1-5]$/.test(seat.number));      // L1–L5, U1–U5
-  const doubleSeats = seats.filter(seat => /^[LU]?1[1-9]$|^[LU]?20$/.test(seat.number)); // L11–L20, U11–U20
+  // Add ID to each seat using seat number
+  const seatsWithId = seats.map(seat => ({ ...seat, id: seat.number }));
+  
+  const singleSeats = seatsWithId.filter(seat => /^[LU]?\d+A$/.test(seat.number));      // L1A, L2A, L3A, L4A, L5A
+  const doubleSeats = seatsWithId.filter(seat => /^[LU]?\d+[BC]$/.test(seat.number));   // L1B, L1C, L2B, L2C, etc.
 
   return (
     <div className="flex flex-col items-center space-y-4">
-      {Array.from({ length: 5 }).map((_, i) => {
-        const single = singleSeats[i];
+      {/* Single seats row */}
+      <div className="flex justify-center space-x-2 mb-4">
+        {singleSeats.map(seat => (
+          <div key={seat.id} className="w-14">
+            {renderSeat(seat)}
+          </div>
+        ))}
+      </div>
+      
+      {/* Double seats rows */}
+      {Array.from({ length: Math.ceil(doubleSeats.length / 2) }).map((_, i) => {
         const double1 = doubleSeats[i * 2];
         const double2 = doubleSeats[i * 2 + 1];
 
         return (
-          <div key={i} className="flex justify-center items-center space-x-8">
-            {/* Single seat on the left */}
-            <div className="w-14 flex justify-center">{single && renderSeat(single)}</div>
-
-            {/* Aisle */}
-            <div className="w-6"></div>
-
-            {/* Double seats on the right */}
-            <div className="flex space-x-4">
-              {double1 && renderSeat(double1)}
-              {double2 && renderSeat(double2)}
-            </div>
+          <div key={i} className="flex justify-center space-x-2">
+            {double1 && renderSeat(double1)}
+            {double2 && renderSeat(double2)}
           </div>
         );
       })}
