@@ -278,27 +278,27 @@ return (
 
         {/* Debug deck visibility */}
         <div className="bg-yellow-50 p-2 mb-4 text-sm">
-          Debug: hasTwoDecks = {bus.hasTwoDecks?.toString()}, activeDeck = {activeDeck}
+          Debug: hasTwoDecks = {bus.hasTwoDecks?.toString()}, activeDeck = {activeDeck}, 
+          seatsLower = {bus.seatsLower?.length || 0}, seatsUpper = {bus.seatsUpper?.length || 0}
         </div>
         
-        {bus.hasTwoDecks && (
-          <div className="bg-white rounded-lg shadow-sm p-4 mb-6">
-            <div className="flex space-x-4">
-              <button
-                className={`px-4 py-2 rounded-md flex items-center ${activeDeck === 'lower' ? 'bg-primary-100 text-primary-700 font-medium' : 'bg-slate-100 text-slate-700 hover:bg-slate-200'}`}
-                onClick={() => setActiveDeck('lower')}
-              >
-                <Bus size={18} className="mr-2" /> Lower Deck
-              </button>
-              <button
-                className={`px-4 py-2 rounded-md flex items-center ${activeDeck === 'upper' ? 'bg-primary-100 text-primary-700 font-medium' : 'bg-slate-100 text-slate-700 hover:bg-slate-200'}`}
-                onClick={() => setActiveDeck('upper')}
-              >
-                <Bus size={18} className="mr-2" /> Upper Deck
-              </button>
-            </div>
+        {/* Always show deck selection for debugging */}
+        <div className="bg-white rounded-lg shadow-sm p-4 mb-6">
+          <div className="flex space-x-4">
+            <button
+              className={`px-4 py-2 rounded-md flex items-center ${activeDeck === 'lower' ? 'bg-primary-100 text-primary-700 font-medium' : 'bg-slate-100 text-slate-700 hover:bg-slate-200'}`}
+              onClick={() => setActiveDeck('lower')}
+            >
+              <Bus size={18} className="mr-2" /> Lower Deck ({bus.seatsLower?.length || 0} seats)
+            </button>
+            <button
+              className={`px-4 py-2 rounded-md flex items-center ${activeDeck === 'upper' ? 'bg-primary-100 text-primary-700 font-medium' : 'bg-slate-100 text-slate-700 hover:bg-slate-200'}`}
+              onClick={() => setActiveDeck('upper')}
+            >
+              <Bus size={18} className="mr-2" /> Upper Deck ({bus.seatsUpper?.length || 0} seats)
+            </button>
           </div>
-        )}
+        </div>
         <div className="bg-white rounded-lg shadow-sm p-4 mb-6">
   <h3 className="mb-2 text-sm font-medium text-slate-700">Select Gender:</h3>
   <div className="flex space-x-4">
