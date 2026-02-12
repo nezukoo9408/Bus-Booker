@@ -155,32 +155,49 @@ const renderSeatLayout = (seats: Seat[]) => {
   });
 
   return (
-    <div className="flex items-start justify-center space-x-8">
-      {/* Single seats in vertical line on the left */}
-      <div className="flex flex-col space-y-2">
-        {singleSeats.map(seat => (
-          <div key={seat.id} className="w-14">
-            {renderSeat(seat)}
+    <div className="bg-white rounded-lg p-4 border-2 border-slate-200">
+      {/* Bus layout with proper structure */}
+      <div className="space-y-3">
+        {/* Row 1: Driver area */}
+        <div className="flex items-center justify-between">
+          <div className="w-16 h-8 bg-slate-700 rounded text-white text-xs flex items-center justify-center">
+            Driver
           </div>
-        ))}
-      </div>
-      
-      {/* Aisle space */}
-      <div className="w-8"></div>
-      
-      {/* Double seats in rows on the right */}
-      <div className="flex flex-col space-y-2">
-        {Array.from({ length: Math.ceil(doubleSeats.length / 2) }).map((_, i) => {
+          <div className="flex space-x-2">
+            {/* Single seat in first row */}
+            {singleSeats[0] && renderSeat(singleSeats[0])}
+          </div>
+        </div>
+        
+        {/* Rows 2-5: Single and double seats */}
+        {Array.from({ length: 4 }).map((_, i) => {
+          const single = singleSeats[i + 1];
           const double1 = doubleSeats[i * 2];
           const double2 = doubleSeats[i * 2 + 1];
 
           return (
-            <div key={i} className="flex space-x-2">
-              {double1 && renderSeat(double1)}
-              {double2 && renderSeat(double2)}
+            <div key={i} className="flex items-center justify-between">
+              <div className="w-16"></div>
+              <div className="flex space-x-2">
+                {single && renderSeat(single)}
+                <div className="w-4"></div> {/* Aisle */}
+                {double1 && renderSeat(double1)}
+                {double2 && renderSeat(double2)}
+              </div>
             </div>
           );
         })}
+        
+        {/* Row 6: Last row of double seats */}
+        <div className="flex items-center justify-between">
+          <div className="w-16"></div>
+          <div className="flex space-x-2">
+            <div className="w-14"></div> {/* Space where single seat would be */}
+            <div className="w-4"></div> {/* Aisle */}
+            {doubleSeats[8] && renderSeat(doubleSeats[8])}
+            {doubleSeats[9] && renderSeat(doubleSeats[9])}
+          </div>
+        </div>
       </div>
     </div>
   );
@@ -206,16 +223,16 @@ const renderSeat = (seat: Seat) => {
     seatStyle += 'bg-gray-400 text-white border-gray-500 pointer-events-none'; // Booked seats
   } else if (isReserved) {
     seatStyle += 'bg-yellow-400 text-white border-yellow-600 pointer-events-none'; // Reserved seats
-  } else if (isLadies) {
-    seatStyle += 'bg-pink-400 text-white border-pink-600'; // Female seats
+  } else if (isLadies && seat.status === 'booked') {
+    seatStyle += 'bg-pink-400 text-white border-pink-600'; // Only pink if booked by female
   } else {
     seatStyle += 'bg-white text-slate-800 border-slate-300 hover:bg-slate-100'; // Available seats
   }
 
   return (
-    <div key={seat.id} className={seatStyle} onClick={() => toggleSeat(seat)}>
+    <div className={seatStyle} onClick={() => toggleSeat(seat)}>
       <span>{seat.number}</span>
-      {isLadies && <span className="text-[10px] leading-none">Ladies</span>}
+      {isLadies && seat.status === 'booked' && <span className="text-[10px] leading-none">F</span>}
     </div>
   );
 };
