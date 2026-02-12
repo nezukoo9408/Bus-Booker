@@ -155,9 +155,9 @@ const renderSeatLayout = (seats: Seat[]) => {
   });
 
   return (
-    <div className="flex flex-col items-center space-y-4">
-      {/* Single seats row */}
-      <div className="flex justify-center space-x-2 mb-4">
+    <div className="flex items-start justify-center space-x-8">
+      {/* Single seats in vertical line on the left */}
+      <div className="flex flex-col space-y-2">
         {singleSeats.map(seat => (
           <div key={seat.id} className="w-14">
             {renderSeat(seat)}
@@ -165,18 +165,23 @@ const renderSeatLayout = (seats: Seat[]) => {
         ))}
       </div>
       
-      {/* Double seats rows */}
-      {Array.from({ length: Math.ceil(doubleSeats.length / 2) }).map((_, i) => {
-        const double1 = doubleSeats[i * 2];
-        const double2 = doubleSeats[i * 2 + 1];
+      {/* Aisle space */}
+      <div className="w-8"></div>
+      
+      {/* Double seats in rows on the right */}
+      <div className="flex flex-col space-y-2">
+        {Array.from({ length: Math.ceil(doubleSeats.length / 2) }).map((_, i) => {
+          const double1 = doubleSeats[i * 2];
+          const double2 = doubleSeats[i * 2 + 1];
 
-        return (
-          <div key={i} className="flex justify-center space-x-2">
-            {double1 && renderSeat(double1)}
-            {double2 && renderSeat(double2)}
-          </div>
-        );
-      })}
+          return (
+            <div key={i} className="flex space-x-2">
+              {double1 && renderSeat(double1)}
+              {double2 && renderSeat(double2)}
+            </div>
+          );
+        })}
+      </div>
     </div>
   );
 };
@@ -188,9 +193,11 @@ const renderSeat = (seat: Seat) => {
   const isBooked = seat.status === 'booked';
   const isLadies = seat.isLadies;
   const isReserved = seat.status === 'reserved';
+  const isSingleSeat = seat.number.includes('A'); // Single seats end with A
 
-  let seatStyle =
-    'cursor-pointer w-12 h-12 rounded-md flex flex-col justify-center items-center text-sm font-medium border shadow-sm transition-all duration-200 ';
+  let seatStyle = isSingleSeat
+    ? 'cursor-pointer w-14 h-10 rounded-lg flex flex-col justify-center items-center text-xs font-medium border shadow-md transition-all duration-200 '
+    : 'cursor-pointer w-12 h-12 rounded-md flex flex-col justify-center items-center text-sm font-medium border shadow-sm transition-all duration-200 ';
 
   // Seat selection styling logic
   if (isSelected) {
