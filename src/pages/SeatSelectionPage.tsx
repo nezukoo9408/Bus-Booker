@@ -208,7 +208,6 @@ const renderSeatLayout = (seats: Seat[]) => {
 const renderSeat = (seat: Seat) => {
   const isSelected = selectedSeats.some(s => s.id === seat.id);
   const isBooked = seat.status === 'booked';
-  const isLadies = seat.isLadies;
   const isReserved = seat.status === 'reserved';
   const isSingleSeat = seat.number.includes('A'); // Single seats end with A
 
@@ -218,13 +217,21 @@ const renderSeat = (seat: Seat) => {
 
   // Seat selection styling logic
   if (isSelected) {
-    seatStyle += 'bg-green-600 text-white border-green-700';
+    // If selected by female, show pink; otherwise show green
+    if (selectedGender === 'female') {
+      seatStyle += 'bg-pink-500 text-white border-pink-600'; // Pink for female selection
+    } else {
+      seatStyle += 'bg-green-600 text-white border-green-700'; // Green for male selection
+    }
   } else if (isBooked) {
-    seatStyle += 'bg-gray-400 text-white border-gray-500 pointer-events-none'; // Booked seats
+    // If booked by female, show pink; otherwise show gray
+    if (seat.isLadies) {
+      seatStyle += 'bg-pink-400 text-white border-pink-600 pointer-events-none'; // Pink for female booked
+    } else {
+      seatStyle += 'bg-gray-400 text-white border-gray-500 pointer-events-none'; // Gray for male booked
+    }
   } else if (isReserved) {
     seatStyle += 'bg-yellow-400 text-white border-yellow-600 pointer-events-none'; // Reserved seats
-  } else if (isLadies && seat.status === 'booked') {
-    seatStyle += 'bg-pink-400 text-white border-pink-600'; // Only pink if booked by female
   } else {
     seatStyle += 'bg-white text-slate-800 border-slate-300 hover:bg-slate-100'; // Available seats
   }
@@ -232,7 +239,7 @@ const renderSeat = (seat: Seat) => {
   return (
     <div className={seatStyle} onClick={() => toggleSeat(seat)}>
       <span>{seat.number}</span>
-      {isLadies && seat.status === 'booked' && <span className="text-[10px] leading-none">F</span>}
+      {seat.isLadies && seat.status === 'booked' && <span className="text-[10px] leading-none">F</span>}
     </div>
   );
 };
@@ -269,6 +276,11 @@ return (
           </div>
         </div>
 
+        {/* Debug deck visibility */}
+        <div className="bg-yellow-50 p-2 mb-4 text-sm">
+          Debug: hasTwoDecks = {bus.hasTwoDecks?.toString()}, activeDeck = {activeDeck}
+        </div>
+        
         {bus.hasTwoDecks && (
           <div className="bg-white rounded-lg shadow-sm p-4 mb-6">
             <div className="flex space-x-4">
@@ -330,8 +342,15 @@ return (
               <div className="mb-10 w-20 ml-auto mr-2">
                 <div className="bg-slate-200 rounded-t-lg p-2 text-center text-sm text-slate-700">Driver</div>
               </div>
+              
+              {/* Debug current deck */}
+              <div className="bg-blue-50 p-2 mb-4 text-sm text-center">
+                Currently showing: {activeDeck === 'lower' ? 'LOWER DECK' : 'UPPER DECK'} 
+                ({activeDeck === 'lower' ? bus.seatsLower?.length || 0 : bus.seatsUpper?.length || 0} seats)
+              </div>
+              
               <div className="flex flex-wrap justify-center mb-10">
-                {activeDeck === 'lower' ? renderSeatLayout(bus.seatsLower) : renderSeatLayout(bus.seatsUpper)}
+                {activeDeck === 'lower' ? renderSeatLayout(bus.seatsLower || []) : renderSeatLayout(bus.seatsUpper || [])}
               </div>
               <div className="w-32 mx-auto mt-8">
                 <div className="border-2 border-dashed border-slate-300 rounded-lg p-2 text-center text-sm text-slate-500">
