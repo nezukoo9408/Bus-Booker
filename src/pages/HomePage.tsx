@@ -46,12 +46,12 @@ const HomePage: React.FC = () => {
   ];
   
   const popularRoutes = [
-    { from: "New York", to: "Washington D.C.", price: 45 },
-    { from: "Los Angeles", to: "San Francisco", price: 65 },
-    { from: "Chicago", to: "Detroit", price: 35 },
-    { from: "Miami", to: "Orlando", price: 29 },
-    { from: "Dallas", to: "Houston", price: 25 },
-    { from: "Seattle", to: "Portland", price: 30 }
+    { from: "Bangalore", to: "Mysore", price: 350 },
+    { from: "Bangalore", to: "Mangalore", price: 500 },
+    { from: "Bangalore", to: "Hubli", price: 600 },
+    { from: "Mysore", to: "Bangalore", price: 350 },
+    { from: "Mangalore", to: "Bangalore", price: 500 },
+    { from: "Hubli", to: "Bangalore", price: 600 }
   ];
   
   return (
