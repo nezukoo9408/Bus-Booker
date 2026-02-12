@@ -52,8 +52,9 @@ const SeatSelectionPage: React.FC = () => {
       return;
     }
 
-    fetch(`${import.meta.env.VITE_API_URL || ''}/api/buses/${busId}?date=${selectedDate}`)
+    fetch(`${import.meta.env.VITE_API_URL || ''}/api/buses/${busId}?date=${selectedDate}&t=${Date.now()}`)
       .then((res) => {
+        console.log("🌐 API Response Status:", res.status);
         if (!res.ok) throw new Error("Bus not found");
         return res.json();
       })
@@ -63,11 +64,20 @@ const SeatSelectionPage: React.FC = () => {
           _id: data._id,
           busName: data.busName,
           hasTwoDecks: data.hasTwoDecks,
+          hasTwoDecksType: typeof data.hasTwoDecks,
+          hasTwoDecksString: JSON.stringify(data.hasTwoDecks),
           totalSeats: data.totalSeats,
           seatsLowerCount: data.seatsLower?.length || 0,
           seatsUpperCount: data.seatsUpper?.length || 0,
           sampleSeats: data.seatsLower?.slice(0, 2).map(s => ({ number: s.number, status: s.status, price: s.price }))
         });
+        
+        // Force hasTwoDecks to true if seatsUpper exists
+        if (data.seatsUpper && data.seatsUpper.length > 0 && !data.hasTwoDecks) {
+          console.log("🔧 Forcing hasTwoDecks to true because seatsUpper exists");
+          data.hasTwoDecks = true;
+        }
+        
         setBus(data);
         setLoading(false);
       })
@@ -282,23 +292,25 @@ return (
           seatsLower = {bus.seatsLower?.length || 0}, seatsUpper = {bus.seatsUpper?.length || 0}
         </div>
         
-        {/* Always show deck selection for debugging */}
-        <div className="bg-white rounded-lg shadow-sm p-4 mb-6">
-          <div className="flex space-x-4">
-            <button
-              className={`px-4 py-2 rounded-md flex items-center ${activeDeck === 'lower' ? 'bg-primary-100 text-primary-700 font-medium' : 'bg-slate-100 text-slate-700 hover:bg-slate-200'}`}
-              onClick={() => setActiveDeck('lower')}
-            >
-              <Bus size={18} className="mr-2" /> Lower Deck ({bus.seatsLower?.length || 0} seats)
-            </button>
-            <button
-              className={`px-4 py-2 rounded-md flex items-center ${activeDeck === 'upper' ? 'bg-primary-100 text-primary-700 font-medium' : 'bg-slate-100 text-slate-700 hover:bg-slate-200'}`}
-              onClick={() => setActiveDeck('upper')}
-            >
-              <Bus size={18} className="mr-2" /> Upper Deck ({bus.seatsUpper?.length || 0} seats)
-            </button>
+        {/* Show deck selection if upper seats exist */}
+        {(bus.hasTwoDecks || (bus.seatsUpper && bus.seatsUpper.length > 0)) && (
+          <div className="bg-white rounded-lg shadow-sm p-4 mb-6">
+            <div className="flex space-x-4">
+              <button
+                className={`px-4 py-2 rounded-md flex items-center ${activeDeck === 'lower' ? 'bg-primary-100 text-primary-700 font-medium' : 'bg-slate-100 text-slate-700 hover:bg-slate-200'}`}
+                onClick={() => setActiveDeck('lower')}
+              >
+                <Bus size={18} className="mr-2" /> Lower Deck ({bus.seatsLower?.length || 0} seats)
+              </button>
+              <button
+                className={`px-4 py-2 rounded-md flex items-center ${activeDeck === 'upper' ? 'bg-primary-100 text-primary-700 font-medium' : 'bg-slate-100 text-slate-700 hover:bg-slate-200'}`}
+                onClick={() => setActiveDeck('upper')}
+              >
+                <Bus size={18} className="mr-2" /> Upper Deck ({bus.seatsUpper?.length || 0} seats)
+              </button>
+            </div>
           </div>
-        </div>
+        )}
         <div className="bg-white rounded-lg shadow-sm p-4 mb-6">
   <h3 className="mb-2 text-sm font-medium text-slate-700">Select Gender:</h3>
   <div className="flex space-x-4">
