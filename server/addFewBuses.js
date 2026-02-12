@@ -9,19 +9,44 @@ const mongoURI = process.env.MONGODB_URI || 'mongodb+srv://Admin:1234ramsha%40@c
 // Just 4 major cities to save space
 const cities = ['Bangalore', 'Mysore', 'Hubli', 'Mangalore'];
 
-// Generate minimal seats (only 10 seats per bus to save space)
-function generateMinimalSeats() {
+// Bus types with different comfort levels and prices
+const busTypes = [
+  { type: 'Non-AC Seater', layout: '2+2', decks: false, baseFare: 200, seats: 40, comfort: 'Basic' },
+  { type: 'AC Seater', layout: '2+2', decks: false, baseFare: 350, seats: 40, comfort: 'Standard' },
+  { type: 'AC Semi-Sleeper', layout: '2+1', decks: false, baseFare: 500, seats: 30, comfort: 'Comfort' },
+  { type: 'Volvo AC Sleeper', layout: '1+1', decks: true, baseFare: 800, seats: 24, comfort: 'Premium' },
+  { type: 'Luxury AC Sleeper', layout: '1+1', decks: true, baseFare: 1200, seats: 20, comfort: 'Luxury' },
+  { type: 'Business Class', layout: '1+1', decks: true, baseFare: 2000, seats: 16, comfort: 'Business' },
+  { type: 'Economy Non-AC', layout: '2+2', decks: false, baseFare: 100, seats: 45, comfort: 'Economy' }
+];
+
+// Bus companies
+const busCompanies = ['VRL', 'SRS', 'Sugama', 'Seabird', 'Orange', 'Intercity'];
+
+// Generate seats based on bus type
+function generateSeats(busType, totalSeats, deck) {
   const seats = [];
-  for (let i = 1; i <= 10; i++) {
+  const seatType = busType.layout.includes('1+1') || busType.layout.includes('Sleeper') ? 'sleeper' : 'seater';
+  const basePrice = busType.baseFare / totalSeats; // Distribute base fare across seats
+  
+  for (let i = 1; i <= totalSeats; i++) {
+    const row = Math.ceil(i / (busType.layout === '1+1' ? 2 : busType.layout === '1+2' ? 3 : 4));
+    const position = i % (busType.layout === '1+1' ? 2 : busType.layout === '1+2' ? 3 : 4);
+    const seatNumber = `${row}${String.fromCharCode(65 + position)}`;
+    
+    // Add some price variation
+    const priceVariation = basePrice + (Math.random() * 50 - 25);
+    
     seats.push({
-      number: `S${i}`,
-      type: 'seater',
+      number: seatNumber,
+      type: seatType,
       status: 'available',
-      price: 200,
-      isLadies: i <= 1,
-      deck: 'lower'
+      price: Math.round(priceVariation),
+      isLadies: i <= 2,
+      deck: deck
     });
   }
+  
   return seats;
 }
 
@@ -66,24 +91,44 @@ async function addFewBuses() {
           
           for (const date of journeyDates) {
             for (let busIndex = 0; busIndex < 7; busIndex++) {
+              // Use different bus types for variety
+              const busType = busTypes[busIndex % busTypes.length];
+              const company = busCompanies[Math.floor(Math.random() * busCompanies.length)];
+              
               const busNumber = `${source.substring(0, 3).toUpperCase()}-${destination.substring(0, 3).toUpperCase()}-${date.replace(/-/g, '')}-${String(busIndex + 1).padStart(2, '0')}`;
               
+              // Generate seats based on bus type
+              const seatsLower = generateSeats(busType, busType.hasTwoDecks ? busType.seats / 2 : busType.seats, 'lower');
+              const seatsUpper = busType.hasTwoDecks ? generateSeats(busType, busType.seats / 2, 'upper') : [];
+              
+              // Generate amenities based on comfort level
+              let amenities = ['Emergency Exit'];
+              if (busType.comfort === 'Business' || busType.comfort === 'Luxury') {
+                amenities = ['WiFi', 'Charging Point', 'Blanket', 'Water Bottle', 'Snacks', 'TV', 'Reading Light', 'Pillow', 'Air Conditioning', 'Emergency Exit'];
+              } else if (busType.comfort === 'Premium') {
+                amenities = ['WiFi', 'Charging Point', 'Blanket', 'Water Bottle', 'Air Conditioning', 'Emergency Exit'];
+              } else if (busType.comfort === 'Comfort') {
+                amenities = ['Charging Point', 'Water Bottle', 'Air Conditioning', 'Emergency Exit'];
+              } else if (busType.comfort === 'Standard') {
+                amenities = ['Air Conditioning', 'Emergency Exit'];
+              }
+
               const bus = new Bus({
                 busNumber: busNumber,
-                busName: `VRL - Non-AC Seater`,
-                busType: 'Non-AC Seater',
+                busName: `${company} - ${busType.type}`,
+                busType: busType.type,
                 source: source,
                 destination: destination,
                 departureTime: '06:00',
                 arrivalTime: '09:00',
                 journeyDate: date,
-                fare: 200,
-                totalSeats: 10,
-                seatLayout: '2+2',
-                hasTwoDecks: false,
-                seatsLower: generateMinimalSeats(),
-                seatsUpper: [],
-                amenities: ['Air Conditioning']
+                fare: busType.baseFare,
+                totalSeats: busType.seats,
+                seatLayout: busType.layout,
+                hasTwoDecks: busType.hasTwoDecks,
+                seatsLower: seatsLower,
+                seatsUpper: seatsUpper,
+                amenities: amenities
               });
 
               await bus.save();
@@ -98,7 +143,8 @@ async function addFewBuses() {
     console.log(`📍 Cities covered: ${cities.join(', ')}`);
     console.log(`📅 Days covered: ${journeyDates.length} days`);
     console.log(`🚌 Buses per route per day: 7`);
-    console.log(`💰 Price: ₹200 per seat`);
+    console.log(`💰 Price range: ₹100-₹2000 based on comfort level`);
+    console.log(`🎯 Comfort levels: Economy, Basic, Standard, Comfort, Premium, Luxury, Business`);
     
     const busCount = await Bus.countDocuments();
     console.log(`📊 Total buses in database: ${busCount}`);

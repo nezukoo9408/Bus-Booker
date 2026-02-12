@@ -68,40 +68,36 @@ const LoginPage: React.FC = () => {
     return valid;
   };
   
-  const handleSubmit = async (e) => {
-  e.preventDefault();
-
-  if (!validateForm()) return;
-
-  setIsSubmitting(true);
-
-  try {
-    const res = await fetch("https://busbooker-api.onrender.com/api/auth/login", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json"
-      },
-      body: JSON.stringify({
-        email: formData.email,
-        password: formData.password
-      })
-    });
-
-    const data = await res.json();
-
-    if (!res.ok) {
-      alert(data.message || "Login failed");
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    
+    if (!validateForm()) {
       return;
     }
-
-    localStorage.setItem("token", data.token);
-    navigate("/");
-  } catch (err) {
-    alert("Network error");
-  } finally {
-    setIsSubmitting(false);
-  }
-};
+    
+    setIsSubmitting(true);
+    
+    try {
+      const success = await login(formData.email, formData.password);
+      
+      if (success) {
+        navigate(from, { replace: true });
+      } else {
+        setErrors({
+          ...errors,
+          general: 'Invalid email or password'
+        });
+      }
+    } catch (error) {
+      toast.error('Something went wrong. Please try again.');
+      setErrors({
+        ...errors,
+        general: 'An error occurred during login'
+      });
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
 
   return (
     <div className="bg-slate-50 min-h-screen py-12 px-4 sm:px-6 lg:px-8 flex flex-col justify-center">
