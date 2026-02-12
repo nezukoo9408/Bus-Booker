@@ -59,22 +59,15 @@ const SeatSelectionPage: React.FC = () => {
         return res.json();
       })
       .then((data) => {
-        console.log("✅ Bus fetched:", data);
-        console.log("🔍 Bus structure:", {
-          _id: data._id,
+        console.log("✅ Bus data loaded:", {
           busName: data.busName,
           hasTwoDecks: data.hasTwoDecks,
-          hasTwoDecksType: typeof data.hasTwoDecks,
-          hasTwoDecksString: JSON.stringify(data.hasTwoDecks),
-          totalSeats: data.totalSeats,
-          seatsLowerCount: data.seatsLower?.length || 0,
-          seatsUpperCount: data.seatsUpper?.length || 0,
-          sampleSeats: data.seatsLower?.slice(0, 2).map(s => ({ number: s.number, status: s.status, price: s.price }))
+          seatsLower: data.seatsLower?.length || 0,
+          seatsUpper: data.seatsUpper?.length || 0
         });
         
         // Force hasTwoDecks to true if seatsUpper exists
         if (data.seatsUpper && data.seatsUpper.length > 0 && !data.hasTwoDecks) {
-          console.log("🔧 Forcing hasTwoDecks to true because seatsUpper exists");
           data.hasTwoDecks = true;
         }
         
@@ -154,15 +147,6 @@ const renderSeatLayout = (seats: Seat[]) => {
   
   const singleSeats = seatsWithId.filter(seat => /^[LU]?\d+A$/.test(seat.number));      // L1A, L2A, L3A, L4A, L5A
   const doubleSeats = seatsWithId.filter(seat => /^[LU]?\d+[BC]$/.test(seat.number));   // L1B, L1C, L2B, L2C, etc.
-
-  console.log(`🪑 Rendering seat layout:`, {
-    totalSeats: seats.length,
-    seatsWithId: seatsWithId.length,
-    singleSeats: singleSeats.length,
-    doubleSeats: doubleSeats.length,
-    sampleSingle: singleSeats[0]?.number,
-    sampleDouble: doubleSeats[0]?.number
-  });
 
   return (
     <div className="bg-white rounded-lg p-4 border-2 border-slate-200">
@@ -286,14 +270,8 @@ return (
           </div>
         </div>
 
-        {/* Debug deck visibility */}
-        <div className="bg-yellow-50 p-2 mb-4 text-sm">
-          Debug: hasTwoDecks = {bus.hasTwoDecks?.toString()}, activeDeck = {activeDeck}, 
-          seatsLower = {bus.seatsLower?.length || 0}, seatsUpper = {bus.seatsUpper?.length || 0}
-        </div>
-        
         {/* Show deck selection if upper seats exist */}
-        {(bus.hasTwoDecks || (bus.seatsUpper && bus.seatsUpper.length > 0)) && (
+        {(bus.seatsUpper && bus.seatsUpper.length > 0) && (
           <div className="bg-white rounded-lg shadow-sm p-4 mb-6">
             <div className="flex space-x-4">
               <button
@@ -353,12 +331,6 @@ return (
               </div>
               <div className="mb-10 w-20 ml-auto mr-2">
                 <div className="bg-slate-200 rounded-t-lg p-2 text-center text-sm text-slate-700">Driver</div>
-              </div>
-              
-              {/* Debug current deck */}
-              <div className="bg-blue-50 p-2 mb-4 text-sm text-center">
-                Currently showing: {activeDeck === 'lower' ? 'LOWER DECK' : 'UPPER DECK'} 
-                ({activeDeck === 'lower' ? bus.seatsLower?.length || 0 : bus.seatsUpper?.length || 0} seats)
               </div>
               
               <div className="flex flex-wrap justify-center mb-10">
