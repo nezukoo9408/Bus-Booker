@@ -58,9 +58,18 @@ const SeatSelectionPage: React.FC = () => {
         return res.json();
       })
       .then((data) => {
+        console.log("✅ Bus fetched:", data);
+        console.log("🔍 Bus structure:", {
+          _id: data._id,
+          busName: data.busName,
+          hasTwoDecks: data.hasTwoDecks,
+          totalSeats: data.totalSeats,
+          seatsLowerCount: data.seatsLower?.length || 0,
+          seatsUpperCount: data.seatsUpper?.length || 0,
+          sampleSeats: data.seatsLower?.slice(0, 2).map(s => ({ number: s.number, status: s.status, price: s.price }))
+        });
         setBus(data);
         setLoading(false);
-        console.log("✅ Bus fetched:", data);
       })
       .catch((err) => {
         console.error("❌ Error fetching bus:", err);
@@ -135,6 +144,15 @@ const renderSeatLayout = (seats: Seat[]) => {
   
   const singleSeats = seatsWithId.filter(seat => /^[LU]?\d+A$/.test(seat.number));      // L1A, L2A, L3A, L4A, L5A
   const doubleSeats = seatsWithId.filter(seat => /^[LU]?\d+[BC]$/.test(seat.number));   // L1B, L1C, L2B, L2C, etc.
+
+  console.log(`🪑 Rendering seat layout:`, {
+    totalSeats: seats.length,
+    seatsWithId: seatsWithId.length,
+    singleSeats: singleSeats.length,
+    doubleSeats: doubleSeats.length,
+    sampleSingle: singleSeats[0]?.number,
+    sampleDouble: doubleSeats[0]?.number
+  });
 
   return (
     <div className="flex flex-col items-center space-y-4">
